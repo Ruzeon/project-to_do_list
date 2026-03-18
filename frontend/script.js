@@ -3,9 +3,22 @@ const API_URL = "http://localhost:8000";
 const taskForm = document.getElementById("taskForm");
 const taskList = document.getElementById("taskList");
 
+let asc = true;
+
+function toggleSort() {
+    asc = !asc;
+    loadTasks();
+}
+
 async function loadTasks() {
   const response = await fetch(`${API_URL}/tasks`);
   const tasks = await response.json();
+
+  tasks.sort((a, b) => {
+    return asc
+        ? a.title.localeCompare(b.title)
+        : b.title.localeCompare(a.title);
+  });
 
   taskList.innerHTML = "";
 
