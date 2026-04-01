@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8000";
+const API_URL = "";
 
 // --- Auth guard ---
 const userId = localStorage.getItem("user_id");
