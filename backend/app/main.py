@@ -6,7 +6,7 @@ from typing import Optional, List
 from datetime import datetime
 
 from .database import engine, SessionLocal
-from .models import Base, Task
+from .models import Base, Task, User
 
 app = FastAPI(title="TODO API")
 
@@ -28,6 +28,37 @@ def get_db():
         yield db
     finally:
         db.close()
+
+# Auth schemas
+class UserCreate(BaseModel):
+    username: str
+    password: str
+
+class UserResponse(BaseModel):
+    id: int
+    username: str
+
+    class Config:
+        from_attributes = True
+
+# Auth endpoints
+@app.post("/register", response_model=UserResponse)
+def register(user: UserCreate, db: Session = Depends(get_db)):
+    existing = db.query(User).filter(User.username == user.username).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Username already taken")
+    db_user = User(username=user.username, password=user.password)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+@app.post("/login", response_model=UserResponse)
+def login(user: UserCreate, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.username == user.username).first()
+    if not db_user or db_user.password != user.password:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    return db_user
 
 # Request/Response schemas
 class TaskCreate(BaseModel):
