@@ -2,9 +2,32 @@ name: Deploy to VPS
 
 on:
   push:
-    branches: [main, master] # или ваша основная ветка
+    branches: [main, master]
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install pytest pytest-cov httpx  # если ещё нет в requirements
+
+      - name: Run tests
+        env:
+          DATABASE_URL: "sqlite:///:memory:"
+        run: |
+          cd backend
+          pytest -v --cov=app
+
   deploy:
     runs-on: ubuntu-latest
     steps:
