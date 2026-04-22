@@ -96,14 +96,14 @@ async function createTask(title) {
 
 // Delete task
 async function deleteTask(id) {
-  await fetch(`${API_URL}/tasks/${id}`, { method: "DELETE" });
+  await fetch(`${API_URL}/tasks/${id}?user_id=${userId}`, { method: "DELETE" });
   loadTasks();
 }
 
 // Toggle completion status
 async function toggleStatus(id, isCompleted) {
   const newStatus = isCompleted ? "completed" : "pending";
-  await fetch(`${API_URL}/tasks/${id}`, {
+  await fetch(`${API_URL}/tasks/${id}?user_id=${userId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status: newStatus })
@@ -115,7 +115,7 @@ async function toggleStatus(id, isCompleted) {
 async function editTask(id, oldTitle) {
   const newTitle = prompt("Введите новое название:", oldTitle);
   if (newTitle && newTitle.trim()) {
-    await fetch(`${API_URL}/tasks/${id}`, {
+    await fetch(`${API_URL}/tasks/${id}?user_id=${userId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: newTitle.trim() })
