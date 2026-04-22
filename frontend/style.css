@@ -70,3 +70,11 @@ li button {
   margin-left: 5px;
   cursor: pointer;
 }
+
+.auth-form {
+  flex-direction: column;
+}
+
+.auth-form button {
+  width: 100%;
+}
