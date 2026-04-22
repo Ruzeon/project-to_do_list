@@ -3,7 +3,8 @@ const API_URL = "";
 // --- Auth guard ---
 const userId = localStorage.getItem("user_id");
 const username = localStorage.getItem("username");
-if (!userId) {
+if (!userId || isNaN(Number(userId))) {
+  localStorage.clear();
   window.location.href = "login.html";
 }
 
@@ -73,7 +74,13 @@ function renderTasks() {
 // Fetch all tasks from server
 async function loadTasks() {
   const response = await fetch(`${API_URL}/tasks?user_id=${userId}`);
-  allTasks = await response.json();
+  if (!response.ok) {
+    localStorage.clear();
+    window.location.href = "login.html";
+    return;
+  }
+  const data = await response.json();
+  allTasks = Array.isArray(data) ? data : [];
   renderTasks();
 }
 
@@ -137,6 +144,11 @@ document.getElementById("usernameDisplay").textContent = username;
 function logout() {
   localStorage.clear();
   window.location.href = "login.html";
+}
+
+var logoutBtn = document.getElementById("logoutBtn");
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", logout);
 }
 
 // Initial load
